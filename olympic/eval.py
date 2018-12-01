@@ -6,8 +6,13 @@ from typing import Callable, List, Union
 from olympic.metrics import NAMED_METRICS
 
 
-def evaluate(model: Module, dataloader: DataLoader, prepare_batch: Callable, metrics: List[Union[str, Callable]],
-             loss_fn: Callable = None, prefix: str = 'val_', suffix: str = ''):
+def evaluate(model: Module,
+             dataloader: DataLoader,
+             prepare_batch: Callable,
+             metrics: List[Union[str, Callable]],
+             loss_fn: Callable = None,
+             prefix: str = 'val_',
+             suffix: str = ''):
     """Evaluate a model on one or more metrics on a particular dataset
 
     # Arguments
@@ -47,6 +52,10 @@ def evaluate(model: Module, dataloader: DataLoader, prepare_batch: Callable, met
                 totals[m] += v * x.shape[0]
 
     for m in ['loss'] + metrics:
-        logs[prefix + m + suffix] = totals[m] / seen
+        if isinstance(m, str):
+            logs[prefix + m + suffix] = totals[m] / seen
+        else:
+            # Assume metric is a callable function
+            logs[prefix + m.__name__ + suffix] = totals[m] / seen
 
     return logs

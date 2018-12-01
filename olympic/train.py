@@ -12,7 +12,13 @@ from olympic.callbacks import DefaultCallback, ProgressBarLogger, CallbackList, 
 from olympic.metrics import NAMED_METRICS
 
 
-def gradient_step(model: Module, optimiser: Optimizer, loss_fn: Callable, x: torch.Tensor, y: torch.Tensor, **kwargs):
+def gradient_step(model: Module,
+                  optimiser: Optimizer,
+                  loss_fn: Callable,
+                  x: torch.Tensor,
+                  y: torch.Tensor,
+                  epoch: int,
+                  **kwargs):
     """Takes a single gradient step.
 
     # Arguments
@@ -32,7 +38,10 @@ def gradient_step(model: Module, optimiser: Optimizer, loss_fn: Callable, x: tor
     return loss, y_pred
 
 
-def batch_metrics(model: Module, y_pred: torch.Tensor, y: torch.Tensor, metrics: List[Union[str, Callable]],
+def batch_metrics(model: Module,
+                  y_pred: torch.Tensor,
+                  y: torch.Tensor,
+                  metrics: List[Union[str, Callable]],
                   batch_logs: dict):
     """Calculates metrics for the current training batch
 
@@ -53,13 +62,20 @@ def batch_metrics(model: Module, y_pred: torch.Tensor, y: torch.Tensor, metrics:
     return batch_logs
 
 
-def fit(model: Module, optimiser: Optimizer, loss_fn: Callable, epochs: int, dataloader: DataLoader,
-        prepare_batch: Callable, metrics: List[Union[str, Callable]] = None, callbacks: List[Callback] = None,
-        verbose: bool =True, fit_function: Callable = gradient_step, fit_function_kwargs: dict = {}):
+def fit(model: Module, optimiser: Optimizer,
+        loss_fn: Callable,
+        epochs: int,
+        dataloader: DataLoader,
+        prepare_batch: Callable = lambda batch: batch,
+        metrics: List[Union[str, Callable]] = None,
+        callbacks: List[Callback] = None,
+        verbose: bool =True,
+        fit_function: Callable = gradient_step,
+        fit_function_kwargs: dict = {}):
     """Function to abstract away training loop.
 
     The benefit of this function is that allows training scripts to be much more readable and allows for easy re-use of
-    common training functionality provided they are written as a subclass of voicemap.Callback (following the
+    common training functionality provided they are written as a subclass of olympic.Callback (following the
     Keras API).
 
     # Arguments
@@ -71,7 +87,7 @@ def fit(model: Module, optimiser: Optimizer, loss_fn: Callable, epochs: int, dat
         prepare_batch: Callable to perform any desired preprocessing
         metrics: Optional list of metrics to evaluate the model with
         callbacks: Additional functionality to incorporate into training such as logging metrics to csv, model
-            checkpointing, learning rate scheduling etc... See voicemap.callbacks for more.
+            checkpointing, learning rate scheduling etc... See olympic.callbacks for more.
         verbose: All print output is muted if this argument is `False`
         fit_function: Function for calculating gradients. Leave as default for simple supervised training on labelled
             batches. For more complex training procedures (meta-learning etc...) you will need to write your own
@@ -110,13 +126,16 @@ def fit(model: Module, optimiser: Optimizer, loss_fn: Callable, epochs: int, dat
 
             x, y = prepare_batch(batch)
 
-            loss, y_pred = fit_function(model, optimiser, loss_fn, x, y, **fit_function_kwargs)
+            loss, y_pred = fit_function(model, optimiser, loss_fn, x, y, epoch, **fit_function_kwargs)
             batch_logs['loss'] = loss.item()
 
             # Loops through all metrics
             batch_logs = batch_metrics(model, y_pred, y, metrics, batch_logs)
 
             callbacks.on_batch_end(batch_index, batch_logs)
+
+            if model.stop_training:
+                break
 
         # Run on epoch end
         callbacks.on_epoch_end(epoch, epoch_logs)
