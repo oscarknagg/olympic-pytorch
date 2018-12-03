@@ -1,7 +1,3 @@
-"""
-The `fit` function in this file implements a slightly modified version
-of the Keras `model.fit()` API.
-"""
 import torch
 from torch.optim import Optimizer
 from torch.nn import Module
@@ -21,7 +17,7 @@ def gradient_step(model: Module,
                   **kwargs):
     """Takes a single gradient step.
 
-    # Arguments
+    Args:
         model: Model to be fitted
         optimiser: Optimiser to calculate gradient step from loss
         loss_fn: Loss function to calculate between predictions and outputs
@@ -45,7 +41,7 @@ def batch_metrics(model: Module,
                   batch_logs: dict):
     """Calculates metrics for the current training batch
 
-    # Arguments
+    Args:
         model: Model being fit
         y_pred: predictions for a particular batch
         y: labels for a particular batch
@@ -70,29 +66,33 @@ def fit(model: Module, optimiser: Optimizer,
         metrics: List[Union[str, Callable]] = None,
         callbacks: List[Callback] = None,
         verbose: bool =True,
-        fit_function: Callable = gradient_step,
-        fit_function_kwargs: dict = {}):
+        update_fn: Callable = gradient_step,
+        update_fn_kwargs: dict = {}):
     """Function to abstract away training loop.
 
     The benefit of this function is that allows training scripts to be much more readable and allows for easy re-use of
     common training functionality provided they are written as a subclass of olympic.Callback (following the
     Keras API).
 
-    # Arguments
+    Args:
         model: Model to be fitted.
         optimiser: Optimiser to calculate gradient step from loss
         loss_fn: Loss function to calculate between predictions and outputs
         epochs: Number of epochs of fitting to be performed
-        dataloader: `torch.DataLoader` instance to fit the model to
-        prepare_batch: Callable to perform any desired preprocessing
-        metrics: Optional list of metrics to evaluate the model with
-        callbacks: Additional functionality to incorporate into training such as logging metrics to csv, model
-            checkpointing, learning rate scheduling etc... See olympic.callbacks for more.
+        dataloader: `torch.DataLoader` instance to supply training data
+        prepare_batch: Callable to perform any desired preprocessing on a batch
+        metrics: Optional list of metrics to evaluate the model with. Each metric should either be a string
+            corresponding to a function in ``olympic.metrics`` (`metrics`). These metrics will automatically be
+            calculated over the training set. You must supply the ``Evaluate`` callback in order to calculate
+            these metrics over another dataset (i.e. validation)
+        callbacks: List of olympic.Callback instances. These implement additional functionality to incorporate
+            into training such as logging metrics to csv, model checkpointing, learning rate scheduling etc...
+            See olympic.callbacks (``callbacks``) for more.
         verbose: All print output is muted if this argument is `False`
-        fit_function: Function for calculating gradients. Leave as default for simple supervised training on labelled
+        update_fn: Function for calculating gradients. Leave as default for simple supervised training on labelled
             batches. For more complex training procedures (meta-learning etc...) you will need to write your own
-            fit_function
-        fit_function_kwargs: Keyword arguments to pass to `fit_function`
+            ``update_fn``
+        update_fn_kwargs: Keyword arguments to pass to ``update_fn``
     """
     # Determine number of samples:
     num_batches = len(dataloader)
@@ -126,7 +126,7 @@ def fit(model: Module, optimiser: Optimizer,
 
             x, y = prepare_batch(batch)
 
-            loss, y_pred = fit_function(model, optimiser, loss_fn, x, y, epoch, **fit_function_kwargs)
+            loss, y_pred = update_fn(model, optimiser, loss_fn, x, y, epoch, **update_fn_kwargs)
             batch_logs['loss'] = loss.item()
 
             # Loops through all metrics
@@ -134,8 +134,9 @@ def fit(model: Module, optimiser: Optimizer,
 
             callbacks.on_batch_end(batch_index, batch_logs)
 
-            if model.stop_training:
-                break
+            if hasattr(model, 'stop_training'):
+                if model.stop_training:
+                    break
 
         # Run on epoch end
         callbacks.on_epoch_end(epoch, epoch_logs)

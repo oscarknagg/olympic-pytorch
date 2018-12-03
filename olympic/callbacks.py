@@ -1,6 +1,3 @@
-"""
-Ports of Callback classes from the Keras library.
-"""
 from tqdm import tqdm
 import numpy as np
 import torch
@@ -198,11 +195,10 @@ class CSVLogger(Callback):
     Supports all values that can be represented as a string,
     including 1D iterables such as np.ndarray.
 
-    # Arguments
+    Args:
         filename: filename of the csv file, e.g. 'run/log.csv'.
         separator: string used to separate elements in the csv file.
-        append: True: append if file exists (useful for continuing
-            training). False: overwrite existing file,
+        append: True: append if file exists (useful for continuing training). False: overwrite existing file.
     """
 
     def __init__(self, filename, separator=',', append=False):
@@ -267,10 +263,10 @@ class CSVLogger(Callback):
 class Evaluate(Callback):
     """Evaluates metrics on a dataset after every epoch.
 
-    # Argments
+    Args:
         dataloader: torch.DataLoader of the dataset on which the model will be evaluated
-        prefix: Prefix to prepend to the names of the metrics when they is logged. Defaults to 'val_' but can be changed
-        if the model is to be evaluated on many datasets separately.
+        prefix: Prefix to prepend to the names of the metrics when they is logged. Defaults to "val_" but can be changed
+            if the model is to be evaluated on many datasets separately.
         suffix: Suffix to append to the names of the metrics when they is logged.
     """
     def __init__(self, dataloader, prefix='val_', suffix=''):
@@ -299,7 +295,7 @@ class ReduceLROnPlateau(Callback):
     quantity and if no improvement is seen for a 'patience' number
     of epochs, the learning rate is reduced.
 
-    # Arguments
+    Args:
         monitor: quantity to be monitored.
         factor: factor by which the learning rate will
             be reduced. new_lr = lr * factor
@@ -409,7 +405,7 @@ class ModelCheckpoint(Callback):
     For example: if `filepath` is `weights.{epoch:02d}-{val_loss:.2f}.hdf5`, then the model checkpoints will be saved
     with the epoch number and the validation loss in the filename.
 
-    # Arguments
+    Args:
         filepath: string, path to save the model file.
         monitor: quantity to monitor.
         verbose: verbosity mode, 0 or 1.
@@ -489,7 +485,8 @@ class ModelCheckpoint(Callback):
 
 class LearningRateScheduler(Callback):
     """Learning rate scheduler.
-    # Arguments
+
+    Args:
         schedule: a function that takes an epoch index as input
             (integer, indexed from 0) and current learning rate
             and returns a new learning rate as output (float).
@@ -545,7 +542,7 @@ class TerminateOnNaN(Callback):
 class EarlyStopping(Callback):
     """Stop training when a monitored quantity has stopped improving.
 
-    # Arguments
+    Args:
         monitor: quantity to be monitored.
         min_delta: minimum change in the monitored quantity
             to qualify as an improvement, i.e. an absolute

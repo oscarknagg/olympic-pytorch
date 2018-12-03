@@ -3,13 +3,19 @@ import torch.nn.functional as F
 
 
 class Flatten(nn.Module):
-    """Converts N-dimensional Tensor of shape [batch_size, d1, d2, ..., dn] to 2-dimensional Tensor
-    of shape [batch_size, d1*d2*...*dn].
-
-    # Arguments
-        input: Input tensor
+    """Module that flattens N-dimensional Tensor of shape [batch_size, d1, d2, ..., dn]
+    to 2-dimensional Tensor of shape [batch_size, d1*d2*...*dn].
     """
     def forward(self, input):
+        """Converts N-dimensional Tensor of shape [batch_size, d1, d2, ..., dn] to 2-dimensional Tensor
+        of shape [batch_size, d1*d2*...*dn].
+
+        # Arguments
+           input: Input tensor
+
+        # Returns
+            output:
+        """
         return input.view(input.size(0), -1)
 
 
