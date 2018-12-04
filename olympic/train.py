@@ -67,7 +67,7 @@ def fit(model: Module, optimiser: Optimizer,
         callbacks: List[Callback] = None,
         verbose: bool =True,
         update_fn: Callable = gradient_step,
-        update_fn_kwargs: dict = {}):
+        update_fn_kwargs: dict = {}) -> List[dict]:
     """Function to abstract away training loop.
 
     The benefit of this function is that allows training scripts to be much more readable and allows for easy re-use of
@@ -93,6 +93,10 @@ def fit(model: Module, optimiser: Optimizer,
             batches. For more complex training procedures (meta-learning etc...) you will need to write your own
             ``update_fn``
         update_fn_kwargs: Keyword arguments to pass to ``update_fn``
+
+    Returns:
+        training_logs: List of dicts where each dict contains information on each epoch. This is equivalent to
+            the data that will be written to CSV using the CSVLogger callback
     """
     # Determine number of samples:
     num_batches = len(dataloader)
@@ -114,6 +118,7 @@ def fit(model: Module, optimiser: Optimizer,
         print('Begin training...')
 
     callbacks.on_train_begin()
+    training_logs = []
 
     for epoch in range(1, epochs+1):
         callbacks.on_epoch_begin(epoch)
@@ -140,9 +145,12 @@ def fit(model: Module, optimiser: Optimizer,
 
         # Run on epoch end
         callbacks.on_epoch_end(epoch, epoch_logs)
+        training_logs.append(epoch_logs)
 
     # Run on train end
     if verbose:
         print('Finished.')
 
     callbacks.on_train_end()
+
+    return training_logs
