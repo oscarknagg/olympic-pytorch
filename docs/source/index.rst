@@ -29,6 +29,7 @@ for training. Concretely, Olympic contains:
     :caption: Features:
 
     fit/index
+    eval
     callbacks
     layers
     metrics
