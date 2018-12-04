@@ -1,4 +1,4 @@
-import pytest, unittest
+import unittest
 from sklearn.datasets import make_classification
 from torch.utils.data import DataLoader, TensorDataset
 from torch import nn
