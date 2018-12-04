@@ -8,19 +8,19 @@ from olympic.metrics import NAMED_METRICS
 
 def evaluate(model: Module,
              dataloader: DataLoader,
-             prepare_batch: Callable,
              metrics: List[Union[str, Callable]],
+             prepare_batch: Callable = lambda x: x,
              loss_fn: Callable = None,
              prefix: str = 'val_',
              suffix: str = ''):
     """Evaluate a model on one or more metrics on a particular dataset
 
-    # Arguments
+    Args:
         model: Model to evaluate
         dataloader: Instance of torch.utils.data.DataLoader representing the dataset
-        prepare_batch: Callable to perform any desired preprocessing
         metrics: List of metrics to evaluate the model with. Metrics must either be a named metric (see `metrics.py`) or
             a Callable that takes predictions and ground truth labels and returns a scalar value
+        prepare_batch: Callable to perform any desired preprocessing
         loss_fn: Loss function to calculate over the dataset
         prefix: Prefix to prepend to the name of each metric - used to identify the dataset. Defaults to 'val_' as
             it is typical to evaluate on a held-out validation dataset
@@ -31,6 +31,7 @@ def evaluate(model: Module,
     totals = {m: 0 for m in metrics}
     if loss_fn is not None:
         totals['loss'] = 0
+
     model.eval()
     with torch.no_grad():
         for batch in dataloader:
@@ -51,7 +52,7 @@ def evaluate(model: Module,
 
                 totals[m] += v * x.shape[0]
 
-    for m in ['loss'] + metrics:
+    for m in metrics + (['loss'] if loss_fn is not None else []):
         if isinstance(m, str):
             logs[prefix + m + suffix] = totals[m] / seen
         else:
