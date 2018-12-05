@@ -22,10 +22,10 @@ Create datasets.::
     ])
 
     train = datasets.MNIST('', train=True, transform=transform, download=True)
-    test = datasets.MNIST('', train=False, transform=transform, download=True)
+    val = datasets.MNIST('', train=False, transform=transform, download=True)
 
     train_loader = DataLoader(train, batch_size=128, num_workers=cpu_count())
-    test_loader = DataLoader(test, batch_size=128, num_workers=cpu_count())
+    val_loader = DataLoader(val, batch_size=128, num_workers=cpu_count())
 
 Define network.::
 
