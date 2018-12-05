@@ -24,6 +24,7 @@ class TestIntegrations(unittest.TestCase):
         model = nn.Sequential(nn.Linear(5, 3))
 
         callbacks = [
+            cbks.Evaluate(dataloader),
             cbks.CSVLogger(__PATH__ + '/tmp/log.csv'),
             cbks.ModelCheckpoint(__PATH__ + '/tmp/model.pt')
         ]

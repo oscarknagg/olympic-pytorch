@@ -8,7 +8,7 @@ __PATH__ = os.path.dirname(os.path.realpath(__file__))
 
 setup(
     name='olympic',
-    version='0.1.1',
+    version='0.1.2',
     description='A port of the Keras API to PyTorch',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -22,5 +22,6 @@ setup(
         'Programming Language :: Python :: 3.6',  # Untested on other python versions
         'License :: OSI Approved :: MIT License',
         "Operating System :: Unix",  # Untested on other OS
-    ]
+    ],
+    install_requires=['tqdm', 'torch', 'torchvision']
 )
