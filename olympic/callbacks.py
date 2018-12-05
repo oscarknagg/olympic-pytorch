@@ -283,7 +283,7 @@ class Evaluate(Callback):
     def on_epoch_end(self, epoch, logs=None):
         logs = logs or {}
         logs.update(
-            evaluate(self.model, self.dataloader, self.prepare_batch, self.metrics, self.loss_fn, self.prefix, self.suffix)
+            evaluate(self.model, self.dataloader, self.metrics, self.prepare_batch, self.loss_fn, self.prefix, self.suffix)
         )
 
 
