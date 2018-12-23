@@ -29,7 +29,7 @@ class TestIntegrations(unittest.TestCase):
             cbks.ModelCheckpoint(__PATH__ + '/tmp/model.pt')
         ]
 
-        fit(
+        history = fit(
             model=model,
             loss_fn=nn.CrossEntropyLoss(),
             optimiser=optim.SGD(model.parameters(), lr=0.1),
@@ -38,5 +38,8 @@ class TestIntegrations(unittest.TestCase):
             metrics=['accuracy'],
             callbacks=callbacks
         )
+
+        history_metrics = ['loss', 'accuracy', 'val_loss', 'val_accuracy']
+        self.assertTrue(all(m in history[0] for m in history_metrics))
 
         rmdir(__PATH__ + '/tmp/')
