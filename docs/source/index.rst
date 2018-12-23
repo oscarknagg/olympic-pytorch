@@ -23,6 +23,7 @@ for training. Concretely, Olympic contains:
     about
     quickstart
     differences
+    changelog
 
 .. toctree::
     :maxdepth: 2
