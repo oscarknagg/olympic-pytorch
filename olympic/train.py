@@ -144,7 +144,7 @@ def fit(model: Module, optimiser: Optimizer,
                     break
 
         # Run on epoch end
-        callbacks.on_epoch_end(epoch, epoch_logs)
+        epoch_logs = callbacks.on_epoch_end(epoch, epoch_logs)
         training_logs.append(epoch_logs)
 
     # Run on train end

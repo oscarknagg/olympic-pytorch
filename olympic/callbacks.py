@@ -47,6 +47,8 @@ class CallbackList(object):
         for callback in self.callbacks:
             callback.on_epoch_end(epoch, logs)
 
+        return logs
+
     def on_batch_begin(self, batch, logs=None):
         """Called right before processing a batch.
         # Arguments
@@ -179,7 +181,7 @@ class ProgressBarLogger(Callback):
     def on_epoch_end(self, epoch, logs=None):
         # Update log values
         self.log_values = {}
-        for k in self.metrics:
+        for k in self.metrics + ['val_'+k for k in self.metrics]:
             if k in logs:
                 self.log_values[k] = logs[k]
 

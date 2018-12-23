@@ -8,7 +8,7 @@ __PATH__ = os.path.dirname(os.path.realpath(__file__))
 
 setup(
     name='olympic',
-    version='0.1.2',
+    version='0.1.3',
     description='A port of the Keras API to PyTorch',
     long_description=long_description,
     long_description_content_type="text/markdown",
